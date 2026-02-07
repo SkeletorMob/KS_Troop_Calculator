@@ -237,15 +237,23 @@ document.getElementById("marches").addEventListener("change", () => {
 });
 
 document.getElementById("sameRatio").addEventListener("change", () => {
-  document.getElementById("marchRatios").innerHTML = "";
-  document.getElementById("mainRatios").style.display =
-    sameRatio.checked ? "block" : "none";
+  const sameRatio = document.getElementById("sameRatio").checked;
+  const mainRatios = document.getElementById("mainRatios");
+  const marchRatios = document.getElementById("marchRatios");
 
-  if (!sameRatio.checked) buildMarchRatios();
+  mainRatios.style.display = sameRatio ? "block" : "none";
+  marchRatios.innerHTML = "";
+
+  if (!sameRatio) buildMarchRatios();
   calculate();
 });
 
+// Initial setup
 populateMainRatios();
+
+// Sync UI with checkbox state on load
+document.getElementById("mainRatios").style.display =
+  document.getElementById("sameRatio").checked ? "block" : "none";
 </script>
 </body>
 </html>
