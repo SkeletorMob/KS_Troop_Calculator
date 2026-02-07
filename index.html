@@ -43,6 +43,10 @@
       border: 1px solid #ddd;
       border-radius: 6px;
       background: #f9f9f9;
+
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
   </style>
 </head>
@@ -54,10 +58,8 @@
 <input id="marches" type="number" placeholder="Total Marches">
 
 <div class="toggle">
-  <label>
-    <input type="checkbox" id="sameRatio" checked>
-    Same Ratio per March
-  </label>
+  <input type="checkbox" id="sameRatio" checked>
+  <label for="sameRatio">Same Ratio per March</label>
 </div>
 
 <div id="marchRatios"></div>
