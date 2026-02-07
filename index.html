@@ -62,14 +62,16 @@
 
 <div id="marchRatios"></div>
   
-<label>Inf %</label>
-<select id="inf"></select>
+<div id="mainRatios">
+  <label>Inf %</label>
+  <select id="inf"></select>
 
-<label>Cav %</label>
-<select id="cav"></select>
+  <label>Cav %</label>
+  <select id="cav"></select>
 
-<label>Archer %</label>
-<select id="arch"></select>
+  <label>Archer %</label>
+  <select id="arch"></select>
+</div>
 
 <button onclick="calculate()">Calculate</button>
 <button onclick="resetCalculator()">Reset</button>
@@ -97,9 +99,9 @@ function populateMainRatios() {
   document.getElementById("cav").replaceWith(createRatioSelect("cav"));
   document.getElementById("arch").replaceWith(createRatioSelect("arch"));
 
-  inf.value = 40;
-  cav.value = 30;
-  arch.value = 30;
+  document.getElementById("inf").value = 40;
+  document.getElementById("cav").value = 30;
+  document.getElementById("arch").value = 30;
 }
 
 function buildMarchRatios() {
@@ -131,7 +133,11 @@ function buildMarchRatios() {
 
     // 4 Assemble hierarchy
     details.appendChild(summary);
-    details.append("Infantry", inf, "Cavalry", cav, "Archers", arch);
+    details.append(
+    "Infantry", inf, document.createElement("br"),
+    "Cavalry", cav, document.createElement("br"),
+     "Archers", arch
+    );
     block.appendChild(details);
     container.appendChild(block);
   }
@@ -230,7 +236,9 @@ document.getElementById("marches").addEventListener("change", () => {
 
 document.getElementById("sameRatio").addEventListener("change", () => {
   document.getElementById("marchRatios").innerHTML = "";
-  const sameRatio = document.getElementById("sameRatio");
+  document.getElementById("mainRatios").style.display =
+    sameRatio.checked ? "block" : "none";
+
   if (!sameRatio.checked) buildMarchRatios();
   calculate();
 });
