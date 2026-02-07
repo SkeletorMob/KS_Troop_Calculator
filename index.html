@@ -16,6 +16,18 @@
       margin-bottom: 0.8rem;
       font-size: 1rem;
     }
+    select {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 0.8rem;
+      font-size: 1rem;
+    }
+    .march-block {
+      border: 1px solid #ccc;
+      padding: 0.6rem;
+      margin-top: 0.8rem;
+      border-radius: 6px;
+    }
     button {
       width: 100%;
       padding: 0.8rem;
@@ -34,6 +46,13 @@
 <input id="troops" type="number" placeholder="Total Troops">
 <input id="marches" type="number" placeholder="Total Marches">
 
+<label>
+  <input type="checkbox" id="sameRatio" checked>
+  Same Ratio per March
+</label>
+
+<div id="marchRatios"></div>
+  
 <label>Inf %</label>
 <select id="inf"></select>
 
@@ -44,64 +63,161 @@
 <select id="arch"></select>
 
 <button onclick="calculate()">Calculate</button>
-
+<button onclick="resetCalculator()">Reset</button>
+  
 <div class="result" id="output"></div>
 
 <script>
-function populateRatios() {
-  const selects = ["inf", "cav", "arch"];
+function createRatioSelect(id) {
+  const select = document.createElement("select");
+  select.id = id;
 
-  selects.forEach(id => {
-    const select = document.getElementById(id);
-    select.innerHTML = "";
+  for (let i = 0; i <= 100; i += 10) {
+    const option = document.createElement("option");
+    option.value = i;
+    option.textContent = i + "%";
+    select.appendChild(option);
+  }
 
-    for (let i = 0; i <= 100; i += 10) {
-      const option = document.createElement("option");
-      option.value = i;
-      option.textContent = i + "%";
-      select.appendChild(option);
-    }
-  });
+  select.addEventListener("change", calculate);
+  return select;
+}
 
-  // Default values
-  document.getElementById("inf").value = 25;
-  document.getElementById("cav").value = 35;
-  document.getElementById("arch").value = 40;
+function populateMainRatios() {
+  document.getElementById("inf").replaceWith(createRatioSelect("inf"));
+  document.getElementById("cav").replaceWith(createRatioSelect("cav"));
+  document.getElementById("arch").replaceWith(createRatioSelect("arch"));
+
+  inf.value = 40;
+  cav.value = 30;
+  arch.value = 30;
+}
+
+function buildMarchRatios() {
+  const container = document.getElementById("marchRatios");
+  container.innerHTML = "";
+
+  const marches = Number(document.getElementById("marches").value);
+  if (!marches || marches < 1) return;
+
+  for (let i = 1; i <= marches; i++) {
+    const block = document.createElement("div");
+    block.className = "march-block";
+
+    block.innerHTML = `<strong>March ${i}</strong>`;
+
+    const inf = createRatioSelect(`m${i}-inf`);
+    const cav = createRatioSelect(`m${i}-cav`);
+    const arch = createRatioSelect(`m${i}-arch`);
+
+    inf.value = 40;
+    cav.value = 30;
+    arch.value = 30;
+
+    block.append("Infantry", inf, "Cavalry", cav, "Archers", arch);
+    container.appendChild(block);
+  }
+}
+
+function ratiosValid(inf, cav, arch) {
+  return inf + cav + arch === 1;
 }
 
 function calculate() {
   const troops = Number(document.getElementById("troops").value);
   const marches = Number(document.getElementById("marches").value);
-
-  const inf = Number(document.getElementById("inf").value) / 100;
-  const cav = Number(document.getElementById("cav").value) / 100;
-  const arch = Number(document.getElementById("arch").value) / 100;
+  const sameRatio = document.getElementById("sameRatio").checked;
+  const output = document.getElementById("output");
+  const button = document.querySelector("button");
 
   if (!troops || !marches) {
-    document.getElementById("output").innerText =
-      "Please enter total troops and marches.";
+    output.innerText = "";
     return;
   }
 
-  if (inf + cav + arch !== 1) {
-    document.getElementById("output").innerText =
-      "Ratios must add up to 100%.";
-    return;
+  let result = "";
+  let usedTroops = 0;
+  const perMarch = Math.floor(troops / marches);
+
+  if (sameRatio) {
+    const inf = inf.value / 100;
+    const cav = cav.value / 100;
+    const arch = arch.value / 100;
+
+    if (!ratiosValid(inf, cav, arch)) {
+      output.innerText = "Ratios must add up to 100%.";
+      return;
+    }
+
+    const i = Math.floor(perMarch * inf);
+    const c = Math.floor(perMarch * cav);
+    const a = Math.floor(perMarch * arch);
+
+    usedTroops = (i + c + a) * marches;
+
+    result += `
+      Per March: ${perMarch}<br>
+      Infantry: ${i}<br>
+      Cavalry: ${c}<br>
+      Archers: ${a}<br>
+    `;
+  } else {
+    for (let i = 1; i <= marches; i++) {
+      const inf = document.getElementById(`m${i}-inf`).value / 100;
+      const cav = document.getElementById(`m${i}-cav`).value / 100;
+      const arch = document.getElementById(`m${i}-arch`).value / 100;
+
+      if (!ratiosValid(inf, cav, arch)) {
+        output.innerText = `March ${i} ratios must add to 100%.`;
+        return;
+      }
+
+      const ti = Math.floor(perMarch * inf);
+      const tc = Math.floor(perMarch * cav);
+      const ta = Math.floor(perMarch * arch);
+
+      usedTroops += ti + tc + ta;
+
+      result += `
+        <strong>March ${i}</strong><br>
+        Infantry: ${ti}<br>
+        Cavalry: ${tc}<br>
+        Archers: ${ta}<br><br>
+      `;
+    }
   }
 
-  const perMarch = troops / marches;
+  const leftover = troops - usedTroops;
+  if (leftover > 0) {
+    result += `<br>⚠️ Leftover Troops: ${leftover}`;
+  }
 
-  document.getElementById("output").innerHTML = `
-    Per March: ${Math.floor(perMarch)}<br>
-    Infantry: ${Math.floor(perMarch * inf)}<br>
-    Cavalry: ${Math.floor(perMarch * cav)}<br>
-    Archers: ${Math.floor(perMarch * arch)}
-  `;
+  output.innerHTML = result;
 }
 
-// Run once when page loads
-populateRatios();
-</script>
+function resetCalculator() {
+  document.getElementById("troops").value = "";
+  document.getElementById("marches").value = "";
+  document.getElementById("sameRatio").checked = true;
+  document.getElementById("marchRatios").innerHTML = "";
+  populateMainRatios();
+  document.getElementById("output").innerText = "";
+}
 
+document.getElementById("marches").addEventListener("change", () => {
+  if (!document.getElementById("sameRatio").checked) {
+    buildMarchRatios();
+  }
+  calculate();
+});
+
+document.getElementById("sameRatio").addEventListener("change", () => {
+  document.getElementById("marchRatios").innerHTML = "";
+  if (!sameRatio.checked) buildMarchRatios();
+  calculate();
+});
+
+populateMainRatios();
+</script>
 </body>
 </html>
