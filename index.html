@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>King Shot Troop Calculator</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 1rem;
+      max-width: 400px;
+      margin: auto;
+    }
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 0.8rem;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 1.1rem;
+    }
+    .result {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h2>King Shot Troop Calculator</h2>
+
+<input id="troops" type="number" placeholder="Total Troops">
+<input id="marches" type="number" placeholder="Total Marches">
+
+<input id="inf" type="number" placeholder="Infantry %">
+<input id="cav" type="number" placeholder="Cavalry %">
+<input id="arch" type="number" placeholder="Archers %">
+
+<button onclick="calculate()">Calculate</button>
+
+<div class="result" id="output"></div>
+
+<script>
+function calculate() {
+  const troops = Number(troops.value);
+  const marches = Number(marches.value);
+
+  const inf = Number(inf.value) / 100;
+  const cav = Number(cav.value) / 100;
+  const arch = Number(arch.value) / 100;
+
+  const perMarch = troops / marches;
+
+  output.innerHTML = `
+    Per March: ${Math.floor(perMarch)}<br>
+    Infantry: ${Math.floor(perMarch * inf)}<br>
+    Cavalry: ${Math.floor(perMarch * cav)}<br>
+    Archers: ${Math.floor(perMarch * arch)}
+  `;
+}
+</script>
+
+</body>
+</html>
