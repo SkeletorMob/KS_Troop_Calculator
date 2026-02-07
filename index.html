@@ -120,7 +120,7 @@ function buildMarchRatios() {
 }
 
 function ratiosValid(inf, cav, arch) {
-  return inf + cav + arch === 1;
+  return Math.abs(inf + cav + arch - 1) < 0.0001;
 }
 
 function calculate() {
@@ -128,7 +128,6 @@ function calculate() {
   const marches = Number(document.getElementById("marches").value);
   const sameRatio = document.getElementById("sameRatio").checked;
   const output = document.getElementById("output");
-  const button = document.querySelector("button");
 
   if (!troops || !marches) {
     output.innerText = "";
@@ -139,19 +138,19 @@ function calculate() {
   let usedTroops = 0;
   const perMarch = Math.floor(troops / marches);
 
-  if (sameRatio) {
-    const inf = inf.value / 100;
-    const cav = cav.value / 100;
-    const arch = arch.value / 100;
+if (sameRatio) {
+  const infRatio = document.getElementById("inf").value / 100;
+  const cavRatio = document.getElementById("cav").value / 100;
+  const archRatio = document.getElementById("arch").value / 100;
 
-    if (!ratiosValid(inf, cav, arch)) {
-      output.innerText = "Ratios must add up to 100%.";
-      return;
-    }
+  if (!ratiosValid(infRatio, cavRatio, archRatio)) {
+    output.innerText = "Ratios must add up to 100%.";
+    return;
+  }
 
-    const i = Math.floor(perMarch * inf);
-    const c = Math.floor(perMarch * cav);
-    const a = Math.floor(perMarch * arch);
+  const i = Math.floor(perMarch * infRatio);
+  const c = Math.floor(perMarch * cavRatio);
+  const a = Math.floor(perMarch * archRatio);
 
     usedTroops = (i + c + a) * marches;
 
@@ -213,6 +212,7 @@ document.getElementById("marches").addEventListener("change", () => {
 
 document.getElementById("sameRatio").addEventListener("change", () => {
   document.getElementById("marchRatios").innerHTML = "";
+  const sameRatio = document.getElementById("sameRatio");
   if (!sameRatio.checked) buildMarchRatios();
   calculate();
 });
