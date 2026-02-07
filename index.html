@@ -37,6 +37,13 @@
       margin-top: 1rem;
       font-weight: bold;
     }
+    .toggle {
+      margin: 1rem 0;
+      padding: 0.6rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #f9f9f9;
+    }
   </style>
 </head>
 <body>
@@ -46,10 +53,12 @@
 <input id="troops" type="number" placeholder="Total Troops">
 <input id="marches" type="number" placeholder="Total Marches">
 
-<label>
-  <input type="checkbox" id="sameRatio" checked>
-  Same Ratio per March
-</label>
+<div class="toggle">
+  <label>
+    <input type="checkbox" id="sameRatio" checked>
+    Same Ratio per March
+  </label>
+</div>
 
 <div id="marchRatios"></div>
   
@@ -104,8 +113,14 @@ function buildMarchRatios() {
     const block = document.createElement("div");
     block.className = "march-block";
 
-    block.innerHTML = `<strong>March ${i}</strong>`;
+    // 1️ Create <details>
+    const details = document.createElement("details");
 
+    // 2️ Create <summary>
+    const summary = document.createElement("summary");
+    summary.textContent = `March ${i}`;
+
+    // 3️ Create selects
     const inf = createRatioSelect(`m${i}-inf`);
     const cav = createRatioSelect(`m${i}-cav`);
     const arch = createRatioSelect(`m${i}-arch`);
@@ -114,7 +129,10 @@ function buildMarchRatios() {
     cav.value = 30;
     arch.value = 30;
 
-    block.append("Infantry", inf, "Cavalry", cav, "Archers", arch);
+    // 4 Assemble hierarchy
+    details.appendChild(summary);
+    details.append("Infantry", inf, "Cavalry", cav, "Archers", arch);
+    block.appendChild(details);
     container.appendChild(block);
   }
 }
