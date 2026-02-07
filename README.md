@@ -12,4 +12,4 @@ Calculator to help make easy troop numbers to match your total troops, total mar
 Open the calculator link, enter your total troops, number of marches, and desired ratios.
 
 ## License
-MIT
+CC BY-NC 4.0
