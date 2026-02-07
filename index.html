@@ -34,32 +34,73 @@
 <input id="troops" type="number" placeholder="Total Troops">
 <input id="marches" type="number" placeholder="Total Marches">
 
-<input id="inf" type="number" placeholder="Infantry %">
-<input id="cav" type="number" placeholder="Cavalry %">
-<input id="arch" type="number" placeholder="Archers %">
+<label>Infantry %</label>
+<select id="inf"></select>
+
+<label>Cavalry %</label>
+<select id="cav"></select>
+
+<label>Archers %</label>
+<select id="arch"></select>
 
 <button onclick="calculate()">Calculate</button>
 
 <div class="result" id="output"></div>
 
 <script>
-function calculate() {
-  const troops = Number(troops.value);
-  const marches = Number(marches.value);
+function populateRatios() {
+  const selects = ["inf", "cav", "arch"];
 
-  const inf = Number(inf.value) / 100;
-  const cav = Number(cav.value) / 100;
-  const arch = Number(arch.value) / 100;
+  selects.forEach(id => {
+    const select = document.getElementById(id);
+    select.innerHTML = "";
+
+    for (let i = 0; i <= 100; i += 10) {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = i + "%";
+      select.appendChild(option);
+    }
+  });
+
+  // Default values
+  document.getElementById("inf").value = 25;
+  document.getElementById("cav").value = 35;
+  document.getElementById("arch").value = 40;
+}
+
+function calculate() {
+  const troops = Number(document.getElementById("troops").value);
+  const marches = Number(document.getElementById("marches").value);
+
+  const inf = Number(document.getElementById("inf").value) / 100;
+  const cav = Number(document.getElementById("cav").value) / 100;
+  const arch = Number(document.getElementById("arch").value) / 100;
+
+  if (!troops || !marches) {
+    document.getElementById("output").innerText =
+      "Please enter total troops and marches.";
+    return;
+  }
+
+  if (inf + cav + arch !== 1) {
+    document.getElementById("output").innerText =
+      "Ratios must add up to 100%.";
+    return;
+  }
 
   const perMarch = troops / marches;
 
-  output.innerHTML = `
+  document.getElementById("output").innerHTML = `
     Per March: ${Math.floor(perMarch)}<br>
     Infantry: ${Math.floor(perMarch * inf)}<br>
     Cavalry: ${Math.floor(perMarch * cav)}<br>
     Archers: ${Math.floor(perMarch * arch)}
   `;
 }
+
+// Run once when page loads
+populateRatios();
 </script>
 
 </body>
